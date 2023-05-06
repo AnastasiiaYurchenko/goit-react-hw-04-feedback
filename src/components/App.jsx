@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Statistics } from './Statistics/Statistics';
 import { FeedbackOptions } from './FeedbackOptions/FeedbackOptions';
@@ -7,38 +7,34 @@ import { Layout } from './Layout/Layout';
 import { GlobalStyle } from './GlobalStyle';
 import { Notification } from './Notification/Notification';
 
-export class App extends Component {
-  static propTypes = {
-    good: PropTypes.number,
-    neutral: PropTypes.number,
-    bad: PropTypes.number,
-    total: PropTypes.number,
-    positivePercentage: PropTypes.number,
-    title: PropTypes.string,
-    message: PropTypes.string,
-    options: PropTypes.arrayOf(PropTypes.string),
-    onLeaveFeedback: PropTypes.func,
+export const App = () => {
+  const [good, setGood] = useState(0);
+  const [neutral, setNeutral] = useState(0);
+  const [bad, setBad] = useState(0);
+
+  const optionsArray = ['good', 'neutral', 'bad'];
+
+  const handleLeaveFeedback = e => {
+    if (e === 'good') {
+      setGood(good + 1);
+      // або
+      // setGood(prev => prev + 1);
+    }
+    if (e === 'neutral') {
+      setNeutral(neutral + 1);
+    }
+    if (e === 'bad') {
+      setBad(bad + 1);
+    }
   };
 
-  state = {
-    good: 0,
-    neutral: 0,
-    bad: 0,
+  const countTotalFeedback = () => {
+    return good + neutral + bad;
   };
 
-  handleLeaveFeedback = e => {
-    // console.log(e);
-    this.setState({ [e]: this.state[e] + 1 });
-    // console.log(this.state);
-  };
-
-  countTotalFeedback = () => {
-    return this.state.good + this.state.neutral + this.state.bad;
-  };
-
-  countPositiveFeedbackPercentage = () => {
-    const totalFeedback = this.state.good + this.state.neutral + this.state.bad;
-    const result = Math.round((this.state.good / totalFeedback) * 100);
+  const countPositiveFeedbackPercentage = () => {
+    const totalFeedback = good + neutral + bad;
+    const result = Math.round((good / totalFeedback) * 100);
 
     if (isNaN(result)) {
       return 0;
@@ -46,32 +42,43 @@ export class App extends Component {
     return result;
   };
 
-  render() {
-    const { good, neutral, bad } = this.state;
-    return (
-      <Layout>
-        <Section title="Please leave feedback">
-          <FeedbackOptions
-            options={Object.keys(this.state)}
-            onLeaveFeedback={this.handleLeaveFeedback}
-          />
-        </Section>
+  return (
+    <Layout>
+      <Section title="Please leave feedback">
+        <FeedbackOptions
+          options={optionsArray}
+          // або
+          // options={Object.keys({ good, neutral, bad })}
+          onLeaveFeedback={handleLeaveFeedback}
+        />
+      </Section>
 
-        <Section title="Statistics">
-          {this.countTotalFeedback() > 0 ? (
-            <Statistics
-              good={good}
-              neutral={neutral}
-              bad={bad}
-              total={this.countTotalFeedback()}
-              positivePercentage={this.countPositiveFeedbackPercentage()}
-            />
-          ) : (
-            <Notification message="There is no feedback" />
-          )}
-        </Section>
-        <GlobalStyle />
-      </Layout>
-    );
-  }
-}
+      <Section title="Statistics">
+        {countTotalFeedback() > 0 ? (
+          <Statistics
+            good={good}
+            neutral={neutral}
+            bad={bad}
+            total={countTotalFeedback()}
+            positivePercentage={countPositiveFeedbackPercentage()}
+          />
+        ) : (
+          <Notification message="There is no feedback" />
+        )}
+      </Section>
+      <GlobalStyle />
+    </Layout>
+  );
+};
+
+App.propTypes = {
+  good: PropTypes.number,
+  neutral: PropTypes.number,
+  bad: PropTypes.number,
+  total: PropTypes.number,
+  positivePercentage: PropTypes.number,
+  title: PropTypes.string,
+  message: PropTypes.string,
+  options: PropTypes.arrayOf(PropTypes.string),
+  onLeaveFeedback: PropTypes.func,
+};
