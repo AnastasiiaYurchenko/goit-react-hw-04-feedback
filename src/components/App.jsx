@@ -16,15 +16,13 @@ export const App = () => {
 
   const handleLeaveFeedback = e => {
     if (e === 'good') {
-      setGood(good + 1);
-      // або
-      // setGood(prev => prev + 1);
+      setGood(prevGood => prevGood + 1);
     }
     if (e === 'neutral') {
-      setNeutral(neutral + 1);
+      setNeutral(prevNeutral => prevNeutral + 1);
     }
     if (e === 'bad') {
-      setBad(bad + 1);
+      setBad(prevBad => prevBad + 1);
     }
   };
 
